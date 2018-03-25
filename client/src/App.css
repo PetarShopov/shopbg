@@ -31,6 +31,24 @@
   text-decoration: none;
 }
 
+.product-info {
+  margin-bottom: 25px;
+  width: 33%;
+  float: left;
+}
+
+.product-info img {
+  width: 100px;
+}
+
+.product-details img {
+  width: 40%;
+}
+
+ul {
+  list-style-type: none;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

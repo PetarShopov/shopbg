@@ -20,7 +20,7 @@ class Navbar extends Component {
     }
 
     handleUserLoggedIn(data) {
-        if(data.success) {
+        if (data.success) {
             this.setState({
                 username: data.user.name
             })
@@ -34,6 +34,7 @@ class Navbar extends Component {
                 {
                     AuthService.isUserAuthenticated() ? (
                         <div>
+                            <Link to='/products/add' className='navbarLink'>Add</Link>
                             <span className='navbarLink' >{this.state.username}</span>
                             <Link to='/users/logout' className='navbarLink'>Logout</Link>
                         </div>
@@ -42,7 +43,7 @@ class Navbar extends Component {
                             <Link to='/users/register' className='navbarLink'>Register</Link>
                             <Link to='/users/login' className='navbarLink'>Login</Link>
                         </div>
-                    )
+                        )
                 }
             </div>
         )
