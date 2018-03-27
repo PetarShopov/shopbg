@@ -6,6 +6,7 @@ let productSchema = new mongoose.Schema({
     image: { type: String, required: true },
     type: { type: String, required: true },
     status: { type: String, required: true },
+    reviews: { type: Array, default: []},
     author: { type: String },
     timestamp: { type: Date, default: Date.now() }
 })

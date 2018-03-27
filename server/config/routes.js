@@ -6,8 +6,8 @@ const errorHandler = require('../utilities/error-handler')
 const passport = require('passport')
 
 module.exports = (app) => {
-    app.post('/products/add', (req, res) => {
-        let productReq = req.body;
+	app.post('/products/add', (req, res) => {
+		let productReq = req.body;
 
 		Product.create({
 			name: productReq.name || 'No name',
@@ -16,6 +16,7 @@ module.exports = (app) => {
 			type: productReq.type || 'No type',
 			status: productReq.status || 'No status',
 			author: productReq.author || 'No author',
+			reviews: [],
 			timestamp: +Date.now()
 		})
 			.then(product => {
@@ -45,7 +46,7 @@ module.exports = (app) => {
 		Product.find({})
 			.then(products => {
 				if (searchText) {
-					products = products.filter(function(item) {
+					products = products.filter(function (item) {
 						return item.name.includes(searchText)
 					})
 				}
@@ -60,11 +61,11 @@ module.exports = (app) => {
 				})
 			})
 	})
-	
+
 	app.get('/products/:id', (req, res) => {
 		const id = req.params.id
 
-		Product.find({'_id':id})
+		Product.find({ '_id': id })
 			.then(product => {
 				if (product && product[0]) {
 					res.status(200).json(product[0])
@@ -83,51 +84,115 @@ module.exports = (app) => {
 
 		return res.status(200)
 	})
-    
-    app.post('/users/register', (req, res) => {
-        return passport.authenticate('local-signup', (err) => {
-            if (err) {
-                return res.status(200).json({
-                    success: false,
-                    message: err
-                })
-            }
 
-            return res.status(200).json({
-                success: true,
-                message: 'You have successfully signed up! Now you should be able to log in.'
-            })
-        })(req, res)
-    })
 
-    app.post('/users/login', (req, res) => {
-        return passport.authenticate('local-login', (err, token, userData) => {
-            if (err) {
-                if (err.name === 'IncorrectCredentialsError') {
-                    return res.status(200).json({
-                        success: false,
-                        message: err.message
-                    })
-                }
+	app.post('/products/:id/reviews/add', (req, res) => {
+		const id = req.params.id
+		let reviewReq = req.body;
 
-                return res.status(200).json({
-                    success: false,
-                    message: err.message
-                })
-            }
+		Product.find({ '_id': id })
+			.then(product => {
+				if (product && product[0]) {
+					product[0].reviews.push(reviewReq)
+					Product.update(
+						{ '_id': id },
+						{
+							reviews: product[0].reviews,
+						}
+					).then(output => {
+						res.status(200).json({
+							success: true,
+							reviews: product[0].reviews
+						})
+					})
+					.catch(err => {
+						let message = errorHandler.handleMongooseError(err)
+						return res.status(200).json({
+							success: false,
+							message: message
+						})
+					})
+				} else {
+					res.status(200).json('No data!')
+				}
+			})
+			.catch(err => {
+				let message = errorHandler.handleMongooseError(err)
+				return res.status(200).json({
+					success: false,
+					message: message
+				})
+			})
 
-            return res.json({
-                success: true,
-                message: 'You have successfully logged in!',
-                token,
-                user: userData
-            })
-        })(req, res)
-    })
+		return res.status(200)
+	})
 
-    app.all('*', (req, res) => {
-        res.status(404)
-        res.send('404 Not Found!')
-        res.end()
-    })
+	app.get('/products/:id/reviews', (req, res) => {
+		const id = req.params.id
+
+		Product.find({ '_id': id })
+			.then(product => {
+				if (product && product[0]) {
+					return res.status(200).json(product[0].reviews)
+				} else {
+					return res.status(200).json('No data!')
+				}
+			})
+			.catch(err => {
+				let message = errorHandler.handleMongooseError(err)
+				return res.status(200).json({
+					success: false,
+					message: message
+				})
+			})
+
+		return res.status(200)
+	})
+
+	app.post('/users/register', (req, res) => {
+		return passport.authenticate('local-signup', (err) => {
+			if (err) {
+				return res.status(200).json({
+					success: false,
+					message: err
+				})
+			}
+
+			return res.status(200).json({
+				success: true,
+				message: 'You have successfully signed up! Now you should be able to log in.'
+			})
+		})(req, res)
+	})
+
+	app.post('/users/login', (req, res) => {
+		return passport.authenticate('local-login', (err, token, userData) => {
+			if (err) {
+				if (err.name === 'IncorrectCredentialsError') {
+					return res.status(200).json({
+						success: false,
+						message: err.message
+					})
+				}
+
+				return res.status(200).json({
+					success: false,
+					message: err.message
+				})
+			}
+
+			return res.json({
+				success: true,
+				message: 'You have successfully logged in!',
+				token,
+				user: userData
+			})
+		})(req, res)
+	})
+
+	app.all('*', (req, res) => {
+		res.status(404)
+		res.send('404 Not Found!')
+		res.end()
+	})
 }

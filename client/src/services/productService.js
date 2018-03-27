@@ -14,6 +14,14 @@ class ProductService {
     static byId(id) {
         return DataService.get(`${baseUrl}/${id}`, true)
     }
+
+    static addReview(id, review) {
+        return DataService.post(`${baseUrl}/${id}/reviews/add`, review, true)
+    }
+
+    static allReviews(id) {
+        return DataService.get(`${baseUrl}/${id}/reviews`, true)
+    }
 }
 
 export default ProductService

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import productActions from '../../actions/ProductActions'
 import productStore from '../../stores/ProductStore'
+import Reviews from './Reviews'
 
 class ProductDetails extends Component {
     constructor(props) {
@@ -43,6 +44,9 @@ class ProductDetails extends Component {
                 <h3>{product.type} - {product.status}</h3>
                 <div>
                     <img src={product.image} alt={product.name} />
+                </div>
+                <div>
+                    <Reviews productId= {this.state.id}/>
                 </div>
             </div>
         )
