@@ -7,6 +7,7 @@ import LogoutPage from '../../users/LogoutPage'
 import AddProduct from '../../products/AddProduct'
 import Home from '../../home/Home'
 import ProductDetails from '../../products/ProductDetails'
+import Analytics from '../Analytics'
 
 const Routes = () => (
     <Switch>
@@ -15,6 +16,7 @@ const Routes = () => (
         <Route path='/users/login' component={LoginPage} />
         <PrivateRoute path='/users/logout' component={LogoutPage} />
         <PrivateRoute path='/products/add' component={AddProduct} />
+        <PrivateRoute path='/analytics' component={Analytics} />
         <PrivateRoute path='/products/:id' component={ProductDetails} />
     </Switch>
 )

@@ -100,7 +100,6 @@ module.exports = (app) => {
 		return res.status(200)
 	})
 
-
 	app.post('/products/:id/reviews/add', (req, res) => {
 		return passport.authenticate('protected-request', (err, user) => {
 			if (err) {
@@ -216,6 +215,36 @@ module.exports = (app) => {
 				token,
 				user: userData
 			})
+		})(req, res)
+	})
+
+	app.get('/analytics', (req, res) => {
+		return passport.authenticate('protected-request', (err, user) => {
+			if (err) {
+				return res.status(200).json({
+					success: false,
+					message: err.message
+				})
+			}
+
+			if (!user) {
+				return res.status(200).json({
+					success: false,
+					message: 'You do not have access to do this!'
+				})
+			}
+
+			User.find({})
+				.then(users => {
+					return res.status(200).json({ users })
+				})
+				.catch(err => {
+					let message = errorHandler.handleMongooseError(err)
+					return res.status(200).json({
+						success: false,
+						message: message
+					})
+				})
 		})(req, res)
 	})
 

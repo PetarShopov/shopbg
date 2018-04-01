@@ -35,6 +35,7 @@ class Navbar extends Component {
                     AuthService.isUserAuthenticated() ? (
                         <div>
                             <Link to='/products/add' className='navbarLink'>Add</Link>
+                            <Link to='/analytics' className='navbarLink'>Analytics</Link>
                             <span className='navbarLink' >{this.state.username}</span>
                             <Link to='/users/logout' className='navbarLink'>Logout</Link>
                         </div>

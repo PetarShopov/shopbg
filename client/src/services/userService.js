@@ -9,6 +9,10 @@ class UserService {
     static login(user) {
         return DataService.post(`${baseUrl}/login`, user)
     }
+
+    static all() {
+        return DataService.get(`analytics`,true)
+    }
 }
 
 export default UserService
