@@ -7,32 +7,47 @@ const passport = require('passport')
 
 module.exports = (app) => {
 	app.post('/products/add', (req, res) => {
-		let productReq = req.body;
-
-		Product.create({
-			name: productReq.name || 'No name',
-			price: productReq.price || 0,
-			image: productReq.image || 'No image',
-			type: productReq.type || 'No type',
-			status: productReq.status || 'No status',
-			author: productReq.author || 'No author',
-			reviews: [],
-			timestamp: +Date.now()
-		})
-			.then(product => {
-				res.status(200).json({
-					success: true,
-					message: 'Product added successfully.',
-					product
-				})
-			})
-			.catch(err => {
-				let message = errorHandler.handleMongooseError(err)
+		return passport.authenticate('protected-request', (err, user) => {
+			if (err) {
 				return res.status(200).json({
 					success: false,
-					message: message
+					message: err.message
 				})
+			}
+
+			if (!user) {
+				return res.status(200).json({
+					success: false,
+					message: 'You do not have access to do this!'
+				})
+			}
+
+			let productReq = req.body;
+			Product.create({
+				name: productReq.name || 'No name',
+				price: productReq.price || 0,
+				image: productReq.image || 'No image',
+				type: productReq.type || 'No type',
+				status: productReq.status || 'No status',
+				author: productReq.author || 'No author',
+				reviews: [],
+				timestamp: +Date.now()
 			})
+				.then(product => {
+					return res.status(200).json({
+						success: true,
+						message: 'Product added successfully.',
+						product
+					})
+				})
+				.catch(err => {
+					let message = errorHandler.handleMongooseError(err)
+					return res.status(200).json({
+						success: false,
+						message: message
+					})
+				})
+		})(req, res)
 	})
 
 	app.get('/products/all', (req, res) => {
@@ -87,44 +102,58 @@ module.exports = (app) => {
 
 
 	app.post('/products/:id/reviews/add', (req, res) => {
-		const id = req.params.id
-		let reviewReq = req.body;
-
-		Product.find({ '_id': id })
-			.then(product => {
-				if (product && product[0]) {
-					product[0].reviews.push(reviewReq)
-					Product.update(
-						{ '_id': id },
-						{
-							reviews: product[0].reviews,
-						}
-					).then(output => {
-						res.status(200).json({
-							success: true,
-							reviews: product[0].reviews
-						})
-					})
-					.catch(err => {
-						let message = errorHandler.handleMongooseError(err)
-						return res.status(200).json({
-							success: false,
-							message: message
-						})
-					})
-				} else {
-					res.status(200).json('No data!')
-				}
-			})
-			.catch(err => {
-				let message = errorHandler.handleMongooseError(err)
+		return passport.authenticate('protected-request', (err, user) => {
+			if (err) {
 				return res.status(200).json({
 					success: false,
-					message: message
+					message: err.message
 				})
-			})
+			}
 
-		return res.status(200)
+			if (!user) {
+				return res.status(200).json({
+					success: false,
+					message: 'You do not have access to do this!'
+				})
+			}
+
+			const id = req.params.id
+			let reviewReq = req.body;
+
+			Product.find({ '_id': id })
+				.then(product => {
+					if (product && product[0]) {
+						product[0].reviews.push(reviewReq)
+						Product.update(
+							{ '_id': id },
+							{
+								reviews: product[0].reviews,
+							}
+						).then(output => {
+							res.status(200).json({
+								success: true,
+								reviews: product[0].reviews
+							})
+						})
+							.catch(err => {
+								let message = errorHandler.handleMongooseError(err)
+								return res.status(200).json({
+									success: false,
+									message: message
+								})
+							})
+					} else {
+						res.status(200).json('No data!')
+					}
+				})
+				.catch(err => {
+					let message = errorHandler.handleMongooseError(err)
+					return res.status(200).json({
+						success: false,
+						message: message
+					})
+				})
+		})(req, res)
 	})
 
 	app.get('/products/:id/reviews', (req, res) => {

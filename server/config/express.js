@@ -6,6 +6,7 @@ const session = require('express-session')
 const passport = require('passport')
 const localSignupStrategy = require('../passport/local-signup')
 const localLoginStrategy = require('../passport/local-login')
+const protectedRequestStrategy = require('../passport/protected-request')
 
 module.exports = (app) => {
     app.use(cookieParser())
@@ -15,6 +16,7 @@ module.exports = (app) => {
     app.use(passport.initialize())
     passport.use('local-signup', localSignupStrategy)
     passport.use('local-login', localLoginStrategy)
+    passport.use('protected-request', protectedRequestStrategy)
 
     app.use(cors())
 
