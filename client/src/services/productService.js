@@ -1,26 +1,34 @@
-import DataService from './dataService'
+import dataService from './dataService'
 const baseUrl = 'products'
 
 class ProductService {
-    static all(page) {        
+    static all(page) {
         page = page || 1
-        return DataService.get(`${baseUrl}/all?page=${page}`)
+        return dataService.get(`${baseUrl}/all?page=${page}`)
     }
 
     static add(product) {
-        return DataService.post(`${baseUrl}/add`, product, true)
+        return dataService.post(`${baseUrl}/add`, product, true)
     }
 
     static byId(id) {
-        return DataService.get(`${baseUrl}/${id}`, true)
+        return dataService.get(`${baseUrl}/${id}`, true)
     }
 
     static addReview(id, review) {
-        return DataService.post(`${baseUrl}/${id}/reviews/add`, review, true)
+        return dataService.post(`${baseUrl}/${id}/reviews/add`, review, true)
     }
 
     static allReviews(id) {
-        return DataService.get(`${baseUrl}/${id}/reviews`, true)
+        return dataService.get(`${baseUrl}/${id}/reviews`, true)
+    }
+
+    static buy(id) {
+        return dataService.post(`${baseUrl}/buy/${id}`, {}, true)
+    }
+
+    static reserve(id) {
+        return dataService.post(`${baseUrl}/reserve/${id}`, {}, true)
     }
 }
 

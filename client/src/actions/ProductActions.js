@@ -6,7 +6,9 @@ const productActions = {
         ALL_PRODUCTS: 'ALL_PRODUCTS',
         PRODUCT_DETAILS: 'PRODUCT_DETAILS',
         ADD_REVIEW: 'ADD_REVIEW',
-        ALL_REVIEWS: 'ALL_REVIEWS'
+        ALL_REVIEWS: 'ALL_REVIEWS',
+        BUY_PRODUCT: 'BUY_PRODUCT',
+        RESERVE_PRODUCT: 'RESERVE_PRODUCT'
     },
     add(product) {
         dispatcher.dispatch({
@@ -37,6 +39,18 @@ const productActions = {
     allReviews(id) {
         dispatcher.dispatch({
             type: this.types.ALL_REVIEWS,
+            id
+        })
+    },
+    buy(id) {
+        dispatcher.dispatch({
+            type: this.types.BUY_PRODUCT,
+            id
+        })
+    },
+    reserve(id) {
+        dispatcher.dispatch({
+            type: this.types.RESERVE_PRODUCT,
             id
         })
     }

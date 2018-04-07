@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import FormHelpers from '../common/forms/FormHelpers'
 import AddProductForm from './AddProductForm'
-import ProductActions from '../../actions/ProductActions'
+import productActions from '../../actions/ProductActions'
 import productStore from '../../stores/ProductStore'
 import toastr from 'toastr'
+import authService from '../../services/authService'
 
 class AddProduct extends Component {
     constructor(props) {
@@ -15,7 +16,9 @@ class AddProduct extends Component {
                 price: 999,
                 image: 'https://cdn.macrumors.com/article-new/2017/09/iphonexdesign.jpg',
                 type: 'Mobile phone',
-                status: 'Reserved'
+                total: 10,
+                status: 'Reserved',
+                author: authService.getUser().name
             },
             error: ''
         }
@@ -41,7 +44,6 @@ class AddProduct extends Component {
             })
         } else {
             toastr.success(data.message)
-            // this.props.history.push(`/`)
             this.props.history.push(`/products/${data.product._id}`)
         }
     }
@@ -67,7 +69,7 @@ class AddProduct extends Component {
             return
         }
 
-        ProductActions.add(this.state.product)
+        productActions.add(this.state.product)
     }
 
     render() {

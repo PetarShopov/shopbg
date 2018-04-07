@@ -31,6 +31,12 @@ const AddProductForm = (props) => (
             onChange={props.onChange} />
         <br />
         <Input
+            name='total'
+            placeholder='Total Count'
+            value={props.product.total}
+            onChange={props.onChange} />
+        <br />
+        <Input
             name='status'
             placeholder='Status'
             value={props.product.status}

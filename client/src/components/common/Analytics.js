@@ -7,7 +7,8 @@ class Analytics extends Component {
         super(props)
 
         this.state = {
-            usersCount: 0
+            usersCount: 0,
+            productsCount: 0
         }
 
         this.handleUsersRetrieved = this.handleUsersRetrieved.bind(this)
@@ -24,16 +25,20 @@ class Analytics extends Component {
 
     handleUsersRetrieved(data) {
         this.setState({
-            usersCount: data.users.length
+            usersCount: data.usersCount,
+            productsCount: data.productsCount
         })
     }
 
     render() {
-        const count = this.state.usersCount
+        const users = this.state.usersCount
+        const products = this.state.productsCount
 
         return (
             <div className='analytics'>
-                Total number of users {count}.
+                Total number of users {users}.
+                <br/>
+                Total number of products {products}.
             </div>
         )
     }

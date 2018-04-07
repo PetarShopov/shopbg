@@ -3,7 +3,7 @@ import AddReviewForm from './AddReviewForm'
 import FormHelpers from '../common/forms/FormHelpers'
 import productActions from '../../actions/ProductActions'
 import productStore from '../../stores/ProductStore'
-import AuthService from '../../services/authService'
+import authService from '../../services/authService'
 import toastr from 'toastr'
 
 class Reviews extends Component {
@@ -11,11 +11,12 @@ class Reviews extends Component {
         super(props)
 
         this.state = {
+            productId: props.productId,
             newReview: {
                 rating: 0,
                 comment: '',
                 createdOn: +Date.now(),
-                user: AuthService.getUser().name
+                user: authService.getUser().name
             },
             reviews: [],
             error: ''
@@ -34,7 +35,7 @@ class Reviews extends Component {
     }
 
     componentDidMount() {
-        productActions.allReviews(this.props.productId)
+        productActions.allReviews(this.state.productId)
     }
 
     componentWillUnmount() {
@@ -48,7 +49,6 @@ class Reviews extends Component {
     }
 
     handleReviewsRetrieved(data) {
-        console.log(data)
         this.setState({
             reviews: data
         })

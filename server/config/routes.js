@@ -29,6 +29,9 @@ module.exports = (app) => {
 				image: productReq.image || 'No image',
 				type: productReq.type || 'No type',
 				status: productReq.status || 'No status',
+				total: productReq.total || 0,
+				reserved: 0,
+				bought: 0,
 				author: productReq.author || 'No author',
 				reviews: [],
 				timestamp: +Date.now()
@@ -155,6 +158,133 @@ module.exports = (app) => {
 		})(req, res)
 	})
 
+	app.post('/products/buy/:id', (req, res) => {
+		return passport.authenticate('protected-request', (err, user) => {
+			if (err) {
+				return res.status(200).json({
+					success: false,
+					message: err.message
+				})
+			}
+
+			if (!user) {
+				return res.status(200).json({
+					success: false,
+					message: 'You do not have access to do this!'
+				})
+			}
+
+			const id = req.params.id;
+
+			Product.find({ '_id': id })
+				.then(product => {
+					if (product && product[0]) {
+						if (product[0].total <= product[0].bought + product[0].reserved) {
+							res.status(200).json({
+								success: false,
+								message: 'No available products!',
+								id: id
+							})
+						} else {
+							product[0].bought += 1;
+							Product.update(
+								{ '_id': id },
+								{
+									bought: product[0].bought,
+								}
+							).then(output => {
+								res.status(200).json({
+									success: true,
+									bought: product[0].bought,
+									id: product[0]._id
+								})
+							})
+								.catch(err => {
+									let message = errorHandler.handleMongooseError(err)
+									return res.status(200).json({
+										success: false,
+										message: message
+									})
+								})
+						}
+					} else {
+						res.status(200).json('No data!')
+					}
+				})
+				.catch(err => {
+					let message = errorHandler.handleMongooseError(err)
+					return res.status(200).json({
+						success: false,
+						message: message
+					})
+				})
+		})(req, res)
+	})
+
+	app.post('/products/reserve/:id', (req, res) => {
+		return passport.authenticate('protected-request', (err, user) => {
+			if (err) {
+				return res.status(200).json({
+					success: false,
+					message: err.message,
+					id: id
+				})
+			}
+
+			if (!user) {
+				return res.status(200).json({
+					success: false,
+					message: 'You do not have access to do this!'
+				})
+			}
+
+			const id = req.params.id;
+
+			Product.find({ '_id': id })
+				.then(product => {
+					if (product && product[0]) {
+						if (product[0].total <= product[0].bought + product[0].reserved) {
+							res.status(200).json({
+								success: false,
+								message: 'No available products!',
+								id: id
+							})
+						} else {
+							product[0].reserved += 1;
+							Product.update(
+								{ '_id': id },
+								{
+									reserved: product[0].reserved,
+								}
+							).then(output => {
+								res.status(200).json({
+									success: true,
+									reserved: product[0].reserved,
+									id: product[0]._id
+								})
+							})
+								.catch(err => {
+									let message = errorHandler.handleMongooseError(err)
+									return res.status(200).json({
+										success: false,
+										message: message
+									})
+								})
+						}
+					} else {
+						res.status(200).json('No data!')
+					}
+				})
+				.catch(err => {
+					let message = errorHandler.handleMongooseError(err)
+					return res.status(200).json({
+						success: false,
+						message: message
+					})
+				})
+		})(req, res)
+	})
+
 	app.get('/products/:id/reviews', (req, res) => {
 		const id = req.params.id
 
@@ -236,7 +366,22 @@ module.exports = (app) => {
 
 			User.find({})
 				.then(users => {
-					return res.status(200).json({ users })
+					const usersCount = users.length
+					Product.find({})
+						.then(products => {
+							const productsCount = products.length
+							return res.status(200).json({
+								usersCount: usersCount,
+								productsCount: productsCount
+							})
+						})
+						.catch(err => {
+							let message = errorHandler.handleMongooseError(err)
+							return res.status(200).json({
+								success: false,
+								message: message
+							})
+						})
 				})
 				.catch(err => {
 					let message = errorHandler.handleMongooseError(err)

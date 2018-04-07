@@ -1,38 +1,50 @@
 import { EventEmitter } from 'events'
 import dispatcher from '../dispatcher'
 import productActions from '../actions/ProductActions'
-import ProductService from '../services/productService'
+import productService from '../services/productService'
 
 class ProductStore extends EventEmitter {
     addProduct(product) {
-        ProductService
+        productService
             .add(product)
             .then(data => this.emit(this.eventTypes.PRODUCT_ADDED, data))
     }
 
     allProducts(page) {
         page = page || 1
-        ProductService
+        productService
             .all(page)
             .then(data => this.emit(this.eventTypes.PRODUCTS_RETRIEVED, data))
     }
 
     byId(id) {
-        ProductService
+        productService
             .byId(id)
             .then(data => this.emit(this.eventTypes.PRODUCT_DETAILS_RETRIEVED, data))
     }
 
     addReview(id, review) {
-        ProductService
+        productService
             .addReview(id, review)
             .then(data => this.emit(this.eventTypes.REVIEW_ADDED, data))
     }
 
     allReview(id) {
-        ProductService
+        productService
             .allReviews(id)
             .then(data => this.emit(this.eventTypes.REVIEWS_RETRIEVED, data))
+    }
+
+    buy(id) {
+        productService
+            .buy(id)
+            .then(data => this.emit(this.eventTypes.PRODUCT_BOUGHT, data))
+    }
+
+    reserve(id) {
+        productService
+            .reserve(id)
+            .then(data => this.emit(this.eventTypes.PRODUCT_RESERVED, data))
     }
 
     handleAction(action) {
@@ -57,6 +69,14 @@ class ProductStore extends EventEmitter {
                 this.allReview(action.id)
                 break
             }
+            case productActions.types.BUY_PRODUCT: {
+                this.buy(action.id)
+                break
+            }
+            case productActions.types.RESERVE_PRODUCT: {
+                this.reserve(action.id)
+                break
+            }
             default: break
         }
     }
@@ -69,7 +89,9 @@ productStore.eventTypes = {
     PRODUCTS_RETRIEVED: 'products_retrieved',
     PRODUCT_DETAILS_RETRIEVED: 'product_details_retrieved',
     REVIEW_ADDED: 'review_added',
-    REVIEWS_RETRIEVED: 'reviews_retrieved'
+    REVIEWS_RETRIEVED: 'reviews_retrieved',
+    PRODUCT_BOUGHT: 'product_bought',
+    PRODUCT_RESERVED: 'PRODUCT_RESERVED'
 }
 
 dispatcher.register(productStore.handleAction.bind(productStore))
